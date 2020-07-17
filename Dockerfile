@@ -34,7 +34,8 @@ RUN yum install -y http://rpms.famillecollet.com/enterprise/remi-release-7.rpm \
                    php-pecl-apcu \
                    php-pecl-apcu-bc \
                    php-pecl-zip \
-                   ssmtp\
+                   ssmtp \
+                   openssl \
  && rm -rf /var/cache/yum/* \
  && yum clean all
 
