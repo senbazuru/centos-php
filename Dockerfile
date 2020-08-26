@@ -12,6 +12,8 @@ ENV TZ="Asia/Tokyo" \
 RUN yum install -y http://rpms.famillecollet.com/enterprise/remi-release-7.rpm \
                    https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm \
  && yum install -y postgresql10 \
+                   postfix cyrus-sasl-plain \
+ && mkfifo /var/spool/postfix/public/pickup \
  && yum install -y --enablerepo=remi,remi-php73 \
                    php \
                    php-opcache \
@@ -34,7 +36,6 @@ RUN yum install -y http://rpms.famillecollet.com/enterprise/remi-release-7.rpm \
                    php-pecl-apcu \
                    php-pecl-apcu-bc \
                    php-pecl-zip \
-                   ssmtp \
                    openssl \
  && rm -rf /var/cache/yum/* \
  && yum clean all
