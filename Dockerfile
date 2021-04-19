@@ -1,7 +1,11 @@
-FROM centos:7.8.2003
+FROM --platform=linux/amd64 golang:1.15 AS entrykit
+RUN go get -v -ldflags "-s -w" github.com/progrium/entrykit/cmd
+
+FROM --platform=linux/amd64 centos:7.8.2003
 
 #locale 追加
 RUN sed -i -e '/override_install_langs/s/$/,ja_JP.utf8/g' /etc/yum.conf \
+ && yum -y update \
  && yum -y reinstall glibc-common
 
 ENV TZ="Asia/Tokyo" \
@@ -40,17 +44,15 @@ RUN yum install -y http://rpms.famillecollet.com/enterprise/remi-release-7.rpm \
  && rm -rf /var/cache/yum/* \
  && yum clean all
 
+ENV COMPOSER_ALLOW_SUPERUSER 1
+
 ## composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin \
- && mv /usr/local/bin/composer.phar  /usr/local/bin/composer \
+RUN curl -sS https://getcomposer.org/installer | php -- --version=1.10.20 --install-dir=/usr/local/bin \
+ && mv /usr/local/bin/composer.phar /usr/local/bin/composer \
  && composer global require hirak/prestissimo
 
-ENV ENTRYKIT_VERSION 0.4.0
-RUN curl -LO https://github.com/progrium/entrykit/releases/download/v${ENTRYKIT_VERSION}/entrykit_${ENTRYKIT_VERSION}_Linux_x86_64.tgz \
- && tar zxvf entrykit_${ENTRYKIT_VERSION}_Linux_x86_64.tgz \
- && mv entrykit /bin/entrykit \
- && chmod +x /bin/entrykit \
- && entrykit --symlink
+COPY --from=entrykit /go/bin/cmd /bin/entrykit
+RUN entrykit --symlink
 
 COPY startup.sh /usr/local/bin/startup.sh
 RUN chmod 755 /usr/local/bin/startup.sh
