@@ -1,7 +1,7 @@
 FROM --platform=linux/amd64 golang:1.15 AS entrykit
 RUN go get -v -ldflags "-s -w" github.com/progrium/entrykit/cmd
 
-FROM --platform=linux/amd64 centos:7.8.2003
+FROM --platform=linux/amd64 centos:7.9.2009
 
 #locale 追加
 RUN sed -i -e '/override_install_langs/s/$/,ja_JP.utf8/g' /etc/yum.conf \
